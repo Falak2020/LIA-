@@ -1,87 +1,91 @@
-import { StatusBar } from 'expo-status-bar';
-import React,{useState,useEffect} from 'react';
-import { StyleSheet, Text, View,Button } from 'react-native';
-import { BarCodeScanner } from 'expo-barcode-scanner';
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ * @flow strict-local
+ */
 
-export default function App() {
+import React,{Component} from 'react';
+import type {Node} from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  View,
+  TouchableOpacity,
+  
+} from 'react-native';
 
-  const [hasPermission,setHasPermission] = useState(null)
-  const [scanned,setScanned] = useState(false)
-  const [text,setText] = useState('Not yet')
-
-  const ask = ()=>{
-    (
-      async () => {
-        const {status} = await BarCodeScanner.requestPermissionsAsync()
-        setHasPermission(status === 'granted')
-      }
-    )()
-  }
-
-  useEffect(()=> {
-    ask();
-  },[])
+import {
+  Colors,
+  DebugInstructions,
+  Header,
+  LearnMoreLinks,
+  ReloadInstructions,
+} from 'react-native/Libraries/NewAppScreen';
 
 
-  const handleBarcode = ({type,data}) =>{
-    setScanned(true)
-    setText(data)
-    console.log(type +'ffff'+data)
-  }
+import QRCodeScanner from 'react-native-qrcode-scanner';
+import { RNCamera } from 'react-native-camera';
+ 
 
-  if(hasPermission === null){
-    return(
-      <View style={styles.container}>
-      <Text>requesting for permission!</Text>
+
+class App extends Component {
+   state = {
+      qr : ""
+    }
+    onRead = e =>{
+      this.setState({qr:e.data})
+    }
+
+
+  render() {
+
     
-    </View>
-    )
-  }
 
-  if(hasPermission === false){
-    return(
-      <View style={styles.container}>
-      <Text>No Access!</Text>
-      <Button title ="Allow camera" onPress = {() => ask()}/>
+    return (
+      <>
+      <SafeAreaView >
     
-    </View>
-    )
-  }
-  return (
-    <View style={styles.container}>
-       <View style ={styles.barcode}>
-          <BarCodeScanner
-          onBarCodeScanned = {scanned? undefined : handleBarcode}
-          style = {{height:400,width:400}}
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        >
+       
+            <QRCodeScanner
+            onRead={this.onRead}
+           
           />
-       </View>
-
-       <Text style = {styles.maintext}>{text}</Text>
-
-       {scanned && <Button title ="scan again" onPress = {()=>setScanned(false)} color='tomato'/>}
-    </View>
-  );
+         <View><Text>{this.state.qr}</Text></View>
+      </ScrollView>
+    </SafeAreaView>
+    </>
+    )
+  }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  barcode:{
-    
-    alignItems:'center',
-    justifyContent:'center',
-    height:300,
-    width:300,
-    overflow:'hidden',
-    borderRadius:30,
 
+
+const styles = StyleSheet.create({
+  sectionContainer: {
+    marginTop: 32,
+    paddingHorizontal: 24,
   },
-  maintext:{
-    fontSize:16,
-    margin:20
-  }
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+  },
+  sectionDescription: {
+    marginTop: 8,
+    fontSize: 18,
+    fontWeight: '400',
+  },
+  highlight: {
+    fontWeight: '700',
+  },
 });
+
+export default App;
